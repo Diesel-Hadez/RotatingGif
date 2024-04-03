@@ -46,12 +46,12 @@ function loadTexture(gl) {
   gl.bindTexture(gl.TEXTURE_2D, texture);
   const level = 0;
   const internalFormat = gl.RGBA;
-  const width = 50;
-  const height = 50;
+  const width = example.width;
+  const height = example.height;
   const border = 0;
   const srcFormat = gl.RGBA;
   const srcType = gl.UNSIGNED_BYTE;
-  const pixel = example['frames'][0]['data'];
+  const pixel = example['frames'][1]['data'];
   // const pixel = new Uint8Array([
   //   0, 0, 255, 255, // opaque blue
   //   0,  255, 0, 255, // opaque green 
@@ -234,7 +234,7 @@ const buffers = initBuffers(gl);
 const texture = loadTexture(gl);
 gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
-document.body.appendChild(createImageFromTexture(gl,texture,454, 453));
+document.body.appendChild(createImageFromTexture(gl,texture,example.width, example.height));
 
 
 let then = 0;

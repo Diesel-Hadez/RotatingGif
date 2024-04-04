@@ -40,7 +40,7 @@ function initTextureBuffer(gl) {
   gl.bufferData(
     gl.ARRAY_BUFFER,
     new Float32Array(textureCoordinates),
-    gl.STATIC_DRAW,
+    gl.DYNAMIC_DRAW,
   );
 
   return textureCoordBuffer;

@@ -31,7 +31,8 @@ function createImageFromTexture(gl, texture, width, height) {
 }
 
 init().then(() => {
-  fetch("sample_2_animation.gif", {
+  // fetch("sample_2_animation.gif", {
+  fetch("DancingPeaks.gif", {
     method: 'GET',
   }).then((response) => {
     console.log(response)
@@ -41,7 +42,7 @@ init().then(() => {
   let example = get_stuff(hmm);
   console.log(JSON.stringify(example));
   // greet("WebAssembly");
-function loadTexture(gl) {
+function loadTexture(gl, num) {
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
   const level = 0;
@@ -51,7 +52,7 @@ function loadTexture(gl) {
   const border = 0;
   const srcFormat = gl.RGBA;
   const srcType = gl.UNSIGNED_BYTE;
-  const pixel = example['frames'][1]['data'];
+  const pixel = example['frames'][num]['data'];
   // const pixel = new Uint8Array([
   //   0, 0, 255, 255, // opaque blue
   //   0,  255, 0, 255, // opaque green 
@@ -231,7 +232,16 @@ const main = () => {
 // objects we'll be drawing.
 const buffers = initBuffers(gl);
 
-const texture = loadTexture(gl);
+let cur_frame = 0;
+let texture = loadTexture(gl, cur_frame);
+const nexter = () => {
+  setTimeout(() => {
+    texture = loadTexture(gl, cur_frame++);
+    cur_frame = cur_frame % example.frames.length;
+    nexter();
+  }, (example.frames[cur_frame].delay < 1 ? 1 : example.frames[cur_frame].delay) *100);
+}
+nexter();
 gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
 document.body.appendChild(createImageFromTexture(gl,texture,example.width, example.height));
@@ -246,7 +256,7 @@ const render = (now) => {
   let deltaTime = now - then
   then = now
   // Set clear color to black, fully opaque
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.clearColor(0.5961, 0.8314, 0.7333, 1.0);
   // Clear the color buffer with specified clear color
   gl.clear(gl.COLOR_BUFFER_BIT);
   rotation += deltaTime;

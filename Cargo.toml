@@ -13,5 +13,4 @@ wasm-bindgen = "0.2"
 serde = { version = "1.0", features = ["derive"] }
 serde_bytes = "0.11"
 serde-wasm-bindgen = "0.4"
-itertools = "0.12.1"
 gif_me_hd = { path = "../gif_me_hd" }

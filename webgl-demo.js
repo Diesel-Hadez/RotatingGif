@@ -32,7 +32,7 @@ function createImageFromTexture(gl, texture, width, height) {
 
 init().then(() => {
   // fetch("sample_2_animation.gif", {
-  fetch("DancingPeaks.gif", {
+  fetch("neko-dance.gif", {
     method: 'GET',
   }).then((response) => {
     console.log(response)
@@ -41,6 +41,17 @@ init().then(() => {
     console.log(hmm);
   let example = get_stuff(hmm);
   console.log(JSON.stringify(example));
+      let blob_image = `P3\n${example['width']} ${example['height']}\n255\n`;
+
+      for (let i = 0; i < example.width*example.height;i+=1 ){
+        blob_image += `${example.frames[0].data[i*4]} ${example.frames[0].data[i*4+1]} ${example.frames[0].data[i*4+2]}\n`;
+      }
+      blob_image = URL.createObjectURL(new Blob([blob_image], {type: "image/x-portable-pixmap"}));
+      const link = document.createElement("a");
+      link.href = blob_image;
+      link.setAttribute('download', "gif_parsed_image_first_frame.ppm");
+      // link.click();
+      console.log(blob_image);
   // greet("WebAssembly");
 function loadTexture(gl, num) {
   const texture = gl.createTexture();
@@ -69,6 +80,7 @@ function loadTexture(gl, num) {
 //     0,255,0,255
 //     ]).flat()
 //   ));
+  console.log(pixel.length)
   gl.texImage2D(
     gl.TEXTURE_2D,
     level,
@@ -85,33 +97,6 @@ function loadTexture(gl, num) {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    const image = new Image();
-  image.onload = () => {
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      level,
-      internalFormat,
-      srcFormat,
-      srcType,
-      image,
-    );
-
-    // WebGL1 has different requirements for power of 2 images
-    // vs. non power of 2 images so check if the image is a
-    // power of 2 in both dimensions.
-    if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
-      // Yes, it's a power of 2. Generate mips.
-      gl.generateMipmap(gl.TEXTURE_2D);
-    } else {
-      // No, it's not a power of 2. Turn off mips and set
-      // wrapping to clamp to edge
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    }
-  };
-  // image.src = "image.png";
   
   function isPowerOf2(value) {
     return (value & (value - 1)) === 0;

@@ -42,6 +42,10 @@ pub fn get_stuff(bytes: &[u8]) -> Result<JsValue, JsValue> {
     let mut cur_color_table = gct;
     let mut frames: Vec<GifFrame> = Vec::new();
     let mut cur_delay = 0;
+    let mut last_frame: Vec<Vec<u8>> = vec![];
+    for _ in 0..width*height {
+        last_frame.push(vec![0,255,0,255]);
+    }
 
     for cur_frame in image.frames {
         for extension in cur_frame.extensions {
@@ -73,19 +77,11 @@ pub fn get_stuff(bytes: &[u8]) -> Result<JsValue, JsValue> {
         };
 
         
-        let frame = match frames.last() {
-            Some(prev_frame) => {
-                // alert(&format!("{}",prev_frame.data.len()));
-                GifFrame {
-                    // data: frame_data
-                    //     .into_iter()
-                    //     .flatten()
-                    //     .collect(),
-                    data: prev_frame
-                        .data
-                        .chunks(4)
+        let frame_data =                 // alert(&format!("{}",prev_frame.data.len()));
+                    last_frame 
+                        .iter()
                         .enumerate()
-                        .collect::<Vec<(usize, &[u8])>>()
+                        .collect::<Vec<(usize, &Vec<u8>)>>()
                         .into_iter()
                         .map(|(pos, val)| -> Vec<u8> {
                             let (x, y) = to_x_y_global(pos);
@@ -112,20 +108,15 @@ pub fn get_stuff(bytes: &[u8]) -> Result<JsValue, JsValue> {
                                     }
                             val.to_vec()
                         })
+                    .collect::<Vec<Vec<u8>>>();
+        last_frame = frame_data.clone();
+        let frame = GifFrame {
+            data: frame_data
+                .iter()
                         .flatten()
+                        .map(|x| *x)
                         .collect(),
-                    delay: cur_delay,
-                }
-            },
-            None => {
-                GifFrame {
-                    data: frame_data
-                        .into_iter()
-                        .flatten()
-                        .collect(),
-                    delay: cur_delay,
-                }
-            },
+            delay: cur_delay,
         };
     
         frames.push(frame);

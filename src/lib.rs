@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use gif_me_hd::decoder::Pixel;
 use wasm_bindgen::prelude::*;
 use serde::{Serialize, Deserialize};
 
@@ -42,18 +43,20 @@ pub fn get_stuff(bytes: &[u8]) -> Result<JsValue, JsValue> {
     let mut cur_color_table = gct;
     let mut frames: Vec<GifFrame> = Vec::new();
     let mut cur_delay = 0;
+    let mut cur_transparent_index = 0;
     let mut last_frame: Vec<Vec<u8>> = vec![];
     for _ in 0..width*height {
-        last_frame.push(vec![0,255,0,255]);
+        last_frame.push(vec![0,0,0,0]);
     }
 
     for cur_frame in image.frames {
         for extension in cur_frame.extensions {
-            cur_delay = match extension {
+            match extension {
                 gif_me_hd::decoder::Extension::GraphicsControlExtension { reserved, disposal_method, user_input_flag, transparent_color_flag, delay_timer, transparent_color_index } => {
-                    delay_timer
+                    cur_delay = delay_timer;
+                    cur_transparent_index = transparent_color_index;
                 },
-                _ => {cur_delay}
+                _ => {}
             }
         }
         cur_color_table = match cur_frame.local_color_table {
@@ -62,8 +65,15 @@ pub fn get_stuff(bytes: &[u8]) -> Result<JsValue, JsValue> {
         };
         let frame_data: Vec<Vec<u8>> = cur_frame.frame_indices
             .iter()
-            .map(|x| *(cur_color_table.get(*x as usize).unwrap()))
-            .map(|x| vec![x.red, x.green, x.blue, 255])
+            .map(|x| {
+                if *x == cur_transparent_index{
+                    return vec![0,0,0,0];
+                }
+                else {
+                    let p = *(cur_color_table.get(*x as usize).unwrap());
+                    return vec![p.red, p.green, p.blue, 255];
+                }
+            })
             .collect();
 
         let to_x_y  = |pos: usize, width: u16| {

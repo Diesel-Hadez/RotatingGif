@@ -224,10 +224,9 @@ const nexter = () => {
     texture = loadTexture(gl, cur_frame++);
     cur_frame = cur_frame % example.frames.length;
     nexter();
-  }, (example.frames[cur_frame].delay < 1 ? 1 : example.frames[cur_frame].delay) *100);
+  }, (example.frames[cur_frame].delay < 1 ? 1 : example.frames[cur_frame].delay) *10);
 }
 nexter();
-gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
 document.body.appendChild(createImageFromTexture(gl,texture,example.width, example.height));
 

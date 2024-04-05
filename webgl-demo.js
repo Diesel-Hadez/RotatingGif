@@ -94,9 +94,10 @@ function loadTexture(gl, num) {
   );
   
   // gl.generateMipmap(gl.TEXTURE_2D);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
   
   function isPowerOf2(value) {
     return (value & (value - 1)) === 0;
@@ -193,7 +194,11 @@ const main = () => {
       // fragColor = mix(texture(uSampler, vTextureCoord), vec4(0,255,0,255), 0.1);
 
       // fragColor = vec4((vTextureCoord.y * vec3(1,0,0)).xyz, 1);
-      fragColor = texture(uSampler, vTextureCoord);
+      highp vec4 t = texture(uSampler, vTextureCoord);
+      if (t.a < 0.1) {
+        discard;
+      }
+      fragColor = t;
     }
   `;
 

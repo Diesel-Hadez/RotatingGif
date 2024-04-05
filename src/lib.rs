@@ -103,20 +103,12 @@ pub fn get_stuff(bytes: &[u8]) -> Result<JsValue, JsValue> {
                                     + cur_frame.image_descriptor.height {
                                         let local_x = x - cur_frame.image_descriptor.left;
                                         let local_y = y - cur_frame.image_descriptor.top;
-                                        let end_result = vec![((local_x as f32 / cur_frame.image_descriptor.width as f32) * 255.0) as u8,
-                                        0, 0, 255];
-                            // alert(&format!("{} ({}, {}) {:#?} ",pos, local_x, local_y, end_result));
-                            // alert(&format!("{} {} {} ", end_result[0], end_result[1], end_result[2]));
-                                        // alert(&format!("{}, {}, {}, {}", local_x, local_y, cur_frame.image_descriptor.width, cur_frame.image_descriptor.height));
-                                        // return end_result;
-                                        // return vec![((local_x as f32 / cur_frame.image_descriptor.width as f32) * 255.0) as u8,
-                                        // ((local_y as f32 / cur_frame.image_descriptor.height as f32) * 255.0) as u8, 0, 255];
                                         return frame_data
                                             .get(((local_y as usize)*(cur_frame.image_descriptor.width as usize)+(local_x as usize)) as usize)
                                             .unwrap()
                                             .to_vec();
                                     }
-                            val.to_vec()
+                            vec![0,0,0,0]
                         })
                     .collect::<Vec<Vec<u8>>>();
         last_frame = frame_data.clone();

@@ -37,10 +37,9 @@ pub fn greet(name: &str) {
 #[wasm_bindgen]
 pub fn get_stuff(bytes: &[u8]) -> Result<JsValue, JsValue> {
     let image = gif_me_hd::decoder::GifFile::new(bytes).unwrap();
-    let width = image.logical_screen_descriptor.canvas_width;
-    let height = image.logical_screen_descriptor.canvas_height;
-    let gct: Vec<gif_me_hd::decoder::Pixel> = image.global_color_table.unwrap();
-    let mut cur_color_table = gct;
+    let width = image.logical_screen_descriptor.canvas_width as u32;
+    let height = image.logical_screen_descriptor.canvas_height as u32;
+    let mut cur_color_table = image.global_color_table.clone();
     let mut frames: Vec<GifFrame> = Vec::new();
     let mut cur_delay = 0;
     let mut cur_transparent_index = 0;
@@ -59,8 +58,8 @@ pub fn get_stuff(bytes: &[u8]) -> Result<JsValue, JsValue> {
                 _ => {}
             }
         }
-        cur_color_table = match cur_frame.local_color_table {
-            Some(table) => table,
+        cur_color_table = match &cur_frame.local_color_table {
+            Some(table) => cur_frame.local_color_table.clone(),
             None => cur_color_table,
         };
         let frame_data: Vec<Vec<u8>> = cur_frame.frame_indices
@@ -70,10 +69,10 @@ pub fn get_stuff(bytes: &[u8]) -> Result<JsValue, JsValue> {
                     return vec![0,0,0,0];
                 }
                 else {
-                    let p = *(cur_color_table.get(*x as usize).unwrap());
+                    let p = *(cur_color_table.as_ref().unwrap().get(*x as usize).unwrap());
                     return vec![p.red, p.green, p.blue, 255];
                 }
-            })
+            })https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial
             .collect();
 
         let to_x_y  = |pos: usize, width: u16| {
